@@ -1,0 +1,35 @@
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+(package-initialize)
+; start auto-complete with emacs
+(require 'auto-complete)
+; do default config for auto-complete
+(require 'auto-complete-config)
+(ac-config-default)
+; start yasnippet with emacs
+(require 'yasnippet)
+(yas-global-mode 1)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages (quote (auto-complete yasnippet ycmd fish-mode evil ##))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-themed ((t (:background "blue1" :foreground "blue" :family "Fira Code")))))
+(require 'evil)
+(evil-mode 1)
+(load-theme 'light-blue)
+(setq explicit-shell-file-name "/bin/bash")
+;;(require 'ycmd)
+;;(add-hook 'after-init-hook #'global-ycmd-mode)
+;; Set default font
+(set-face-attribute 'default nil
+                    :family "Fira Code"
+                    :height 120
+                    :weight 'normal
+                    :width 'normal)
