@@ -1,29 +1,41 @@
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+
 (package-initialize)
+
 ; start auto-complete with emacs
 (require 'auto-complete)
 ; do default config for auto-complete
 (require 'auto-complete-config)
 (ac-config-default)
+
 ; start yasnippet with emacs
 (require 'yasnippet)
 (yas-global-mode 1)
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages (quote (auto-complete yasnippet ycmd fish-mode evil ##))))
+
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-themed ((t (:background "blue1" :foreground "blue" :family "Fira Code")))))
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-enabled-themes (quote (sanityinc-tomorrow-blue)))
+ '(custom-safe-themes
+   (quote
+    ("82d2cac368ccdec2fcc7573f24c3f79654b78bf133096f9b40c20d97ec1d8016" default)))
+ '(package-selected-packages
+   (quote
+    (fiplr google-c-style flymake-google-cpplint auto-complete-c-headers iedit color-theme-sanityinc-tomorrow auto-complete yasnippet ycmd fish-mode evil ##))))
+
 (require 'evil)
 (evil-mode 1)
-(load-theme 'light-blue)
+;;(load-theme 'light-blue)
 (setq explicit-shell-file-name "/bin/bash")
 ;;(require 'ycmd)
 ;;(add-hook 'after-init-hook #'global-ycmd-mode)
@@ -33,3 +45,52 @@
                     :height 120
                     :weight 'normal
                     :width 'normal)
+;;(global-set-key (kbd "C-x ff") 'fiplr-find-file)
+;;(global-set-key (kbd "C-x dd") 'fiplr-find-directory)
+;;(setq fiplr-root-markers '(".git" ".svn"))
+;;(setq fiplr-ignored-globs '((directories (".git" ".svn"))
+;;                            (files ("*.jpg" "*.png" "*.zip" "*~"))))
+
+;; ----------------------------------------------------------------------
+;; CEDET
+;; ----------------------------------------------------------------------
+;; Load CEDET.
+;; See cedet/common/cedet.info for configuration details.
+;; IMPORTANT: For Emacs >= 23.2, you must place this *before* any
+;; CEDET component (including EIEIO) gets activated by another 
+;; package (Gnus, auth-source, ...).
+(load-file "~/cedet-1.1/common/cedet.el")
+
+;; Enable EDE (Project Management) features
+(global-ede-mode 1)
+
+;; Enable EDE for a pre-existing C++ project
+;; (ede-cpp-root-project "NAME" :file "~/myproject/Makefile")
+
+
+;; Enabling Semantic (code-parsing, smart completion) features
+;; Select one of the following:
+
+;; * This enables the database and idle reparse engines
+(semantic-load-enable-minimum-features)
+
+;; * This enables some tools useful for coding, such as summary mode,
+;;   imenu support, and the semantic navigator
+(semantic-load-enable-code-helpers)
+
+;; * This enables even more coding tools such as intellisense mode,
+;;   decoration mode, and stickyfunc mode (plus regular code helpers)
+;; (semantic-load-enable-gaudy-code-helpers)
+
+;; * This enables the use of Exuberant ctags if you have it installed.
+;;   If you use C++ templates or boost, you should NOT enable it.
+;; (semantic-load-enable-all-exuberent-ctags-support)
+;;   Or, use one of these two types of support.
+;;   Add support for new languages only via ctags.
+;; (semantic-load-enable-primary-exuberent-ctags-support)
+;;   Add support for using ctags as a backup parser.
+;; (semantic-load-enable-secondary-exuberent-ctags-support)
+
+;; Enable SRecode (Template management) minor-mode.
+;; (global-srecode-minor-mode 1)
+;; ----------------------------------------------------------------------
