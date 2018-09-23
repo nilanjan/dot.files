@@ -1,3 +1,6 @@
+;;; .emacs --- Initialization file for Emacs
+;;; Commentary: Emacs Startup File --- initialization for Emacs
+
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 
@@ -58,3 +61,7 @@
 (setq nlinum-relative-redisplay-delay 0)      ;; delay
 (setq nlinum-relative-current-symbol "")      ;; or "" for display current line number or "->"
 (setq nlinum-relative-offset 0)                 ;; 1 if you want 0, 2, 3...
+
+(require 'flycheck)
+(global-flycheck-mode)
+
