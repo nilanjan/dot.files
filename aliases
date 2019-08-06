@@ -1,0 +1,343 @@
+# Quick edits
+alias ea='nvim ~/.config/fish/aliases.fish'
+alias ef='nvim ~/.config/fish/config.fish'
+alias eg='nvim ~/.gitconfig'
+alias ev='nvim ~/.vimrc'
+alias es='nvim ~/bin/autosort'
+alias et='nvim ~/.tmux.conf'
+
+alias vim-norc='nvim -u NORC'
+alias vim-none='nvim -u NONE'
+
+alias n='nsight'
+alias vi='nvim'
+alias df='df -kTh'
+alias du='du -kh'
+alias mv='mv -i'
+alias cp='cp -i'
+alias rm='rm -i'
+alias h='history'
+alias j='jobs -l'
+alias tree='tree -Csu'
+#alias ls='ls -hFG'
+alias ls='exa -hFG'
+alias dir='dir --color=auto'
+alias vdir='vdir --color=auto'
+alias grep='grep -n -r --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+alias ll='ls -l --group-directories-first'
+alias la='ls -Al'
+alias l='ls -CF'
+alias c='clear'
+alias ml='matlab &'
+alias mk='make'
+alias cd..='cd ..'
+alias md='mkdir -p'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias .....='cd ../../../..'
+alias ......='cd ../../../../..'
+alias .......='cd ../../../../../..'
+alias ........='cd ../../../../../../..'
+alias lt='ls -ltr'
+alias lx='ls -lXB'
+alias lk='ls -lSr'
+alias u='users'
+alias mc='make clean'
+alias f='finger -s'
+alias e='exit'
+alias xt='xterm -geometry 80x64 -fa Menlo -fs 9 -sb -rightbar &'
+alias xc='open -a xcode'
+alias lime='open -a Sublime\ Text'
+alias ff='find . -name'
+alias artist='cd $HOME/Projects/artist'
+alias em='emacs -nw'
+
+function timestamp() {
+    python -c 'import time; print(int(time.time()))'
+}
+
+#alias df 'command df -m'
+alias j=jobs
+alias su='command su -m'
+
+function lsd() { #-d 'List only directories (in the current dir)'
+    command ls -d */ | sed -Ee 's,/+$,,'
+}
+
+# Colorized cat (will guess file type based on contents)
+alias ccat='pygmentize -g'
+
+alias g=git
+alias x='tig HEAD'
+alias xx='tig --exclude=production --exclude="*/production" --exclude=canary --exclude="*/canary" --branches'
+alias xxa='tig --exclude=production --exclude="*/production" --exclude=canary --exclude="*/canary" --all'
+alias xxaa='tig --all'
+alias notes='rg "TODO|HACK|FIXME|OPTIMIZE"'
+
+alias m=make
+#alias mm 'make run'
+
+function da() { #-d "Allow or disallow .envrc after printing it."
+    echo "------------------------------------------------"
+    cat .envrc
+    echo "------------------------------------------------"
+    echo "To allow, hit Return."
+    read answer
+    direnv allow
+}
+
+function vimff() {
+    vim (ffind -tf $argv)
+}
+
+function f() {
+    git ls-tree -r --name-only HEAD
+}
+
+function vf() {
+    f | fzf | xargs -o vim
+}
+
+
+function vw() {
+    vim (which "$argv")
+}
+
+function vflow() { #-d 'Opens all files with Flow issues in Vim'
+    flow | grep -Ee '^Error --' | rev | cut -d' ' -f1 | rev | cut -d: -f1 | sort -u | xargs -o vim
+}
+
+# alias git hub
+alias gti=git
+alias a='git amend --allow-empty --no-verify'
+alias gb='git recent-branches 2.days.ago'
+alias ggco='git switch'
+alias fl='clear; and flow-limit'
+
+# Begining of git-aliases
+pull_or_push() {
+  if [ $# -eq 2 ]; then
+    git $1 $2 `git rev-parse --abbrev-ref HEAD`
+  else
+    git $1 origin `git rev-parse --abbrev-ref HEAD`
+  fi
+}
+pull() { pull_or_push "pull" $@ }
+push() { pull_or_push "push" $@ }
+
+alias gf='git fetch'
+alias gb='git branch'
+alias unmerged="git branch --no-merged"
+alias plog="git log --oneline --decorate"
+
+reset() {
+  if [ $# -eq 0 ]; then
+    git reset --hard
+  else
+    local curr_branch=`git rev-parse --abbrev-ref HEAD`
+    git checkout $curr_branch $1
+  fi
+}
+
+flog() {
+  git log -p $1
+}
+
+status() {
+  if [ "$GIT_ALIASES_SHORTER_GIT_STATUS" -ne 1 ]; then; git status
+  else; git status -sb; fi
+}
+alias s='status'
+
+co() {
+  git fetch
+  git checkout "$1"
+  if [ "$GIT_ALIASES_SILENCE_GIT_STATUS" -ne 1 ]; then; git status; fi
+}
+compdef _git co=git-checkout
+
+cob() {
+  git checkout -b "$1"
+  if [ "$GIT_ALIASES_AUTOPUSH_NEW_BRANCH" -eq 1 ]; then
+    git add "$(git rev-parse --show-toplevel)" && git commit -a -m "Started $1" && push
+  fi
+}
+
+cobm() {
+  git checkout master && pull && git checkout -b "$1"
+}
+
+cobd() {
+  git checkout dev && pull && git checkout -b "$1"
+}
+
+corbm() {
+  corp master && git checkout -b "$1"
+}
+
+corbd() {
+  corp dev && git checkout -b "$1"
+}
+
+cop() {
+  git fetch && git checkout "$1" && pull && git fetch
+  if [ "$GIT_ALIASES_SILENCE_GIT_STATUS" -ne 1 ]; then; git status; fi
+}
+compdef _git cop=git-checkout
+
+
+rp() {
+  pull && git fetch && rb
+}
+
+rb() {
+  bundle install && bundle exec rake db:migrate && bundle exec rake db:test:prepare && bundle exec rake db:seed
+}
+
+corp() {
+  co "$1" && rp
+}
+compdef _git corp=git-checkout
+
+
+backmerge_branch() {
+  local curr_branch=`git rev-parse --abbrev-ref HEAD`
+  pull && cop $1 && co $curr_branch && git merge $1 -m 'Backmerged master' && push
+  echo 'Backmerge completed.'
+}
+
+backmerge() {
+  backmerge_branch 'master'
+}
+
+backmerge_dev() {
+  backmerge_branch 'dev'
+}
+
+ruby_backmerge() {
+  local curr_branch=`git rev-parse --abbrev-ref HEAD`
+  pull && corp master && reset && co $curr_branch && git merge origin/master -m 'Backmerged master' && push
+  echo 'Backmerge completed.  You may have to restart your local server.'
+}
+
+backmerge_all() {
+  git fetch
+  local curr_branch=`git rev-parse --abbrev-ref HEAD`
+  for branch in $(git for-each-ref --format='%(refname)' refs/heads/); do
+    local branch=${branch/refs\/heads\//}
+    echo "!!! Backmerging $branch ..."
+    cop master
+    co $branch && git merge origin/master -m 'Backmerged master' && push
+  done 
+  co curr_branch
+}
+
+
+release() {
+  if [ $# -eq 0 ]; then echo "You must pass a tag to release.";
+  else cop master && git tag $1 && git push origin $1;
+  fi
+}
+
+
+deploy() {
+  if [ -f 'bin/deploy' ]; then bin/deploy; else; git push heroku master; fi
+}
+alias deproy=deploy
+
+
+dif() {
+  if [ "$GIT_ALIASES_ICDIFF" -eq 1 ]; then; git icdiff
+  elif [ "$GIT_ALIASES_ICDIFF" -eq 2 ]; then; git difftool --extcmd icdiff
+  else; git diff; fi
+  git status
+}
+
+
+prune() {
+  git branch -D "$1" && git push origin --delete "$1"
+}
+
+
+clone() {
+  local yes_cd=true
+  while getopts "d:" OPTION
+  do
+    case $OPTION in
+      d)
+        local yes_cd=false
+        shift
+        ;;
+    esac
+  done
+  if [[ -z $2 ]]; then
+    local repo_name=$1
+    while [ "${repo_name%%/*}" != "$repo_name" ]; do
+       repo_name=${repo_name#*/}
+    done
+    repo_name=${repo_name%.*}
+    git clone $1
+    if $yes_cd; then; cd $repo_name; fi
+  else
+    if [[ $# -eq 3 ]]; then
+      git clone git@github.com:$1/$2.git $3
+      if $yes_cd; then; cd $3; fi
+    else
+      git clone git@github.com:$1/$2.git
+      if $yes_cd; then; cd $2; fi
+    fi
+  fi
+}
+
+
+oldbranches() {
+  if [[ $# -eq 0 ]]; then; local hed=10; else; local hed=$1; fi
+  echo $hed
+  echo $#
+  git for-each-ref --sort=committerdate --format='No updates to %(refname:short) since %(committerdate:short)...' | head -n $hed
+}
+# End of git-aliases
+
+function git-search() {
+    git log -S"$argv" --pretty=format:%H | map git show 
+}
+
+function cleanpycs() {
+    find . -name '.git' -prune -o -name '__pycache__' -delete
+    find . -name '.git' -prune -o -name '*.py[co]' -delete
+}
+
+function cleanorigs() {
+    find . '(' -name '*.orig' -o -name '*.BACKUP.*' -o -name '*.BASE.*' -o -name '*.LOCAL.*' -o -name '*.REMOTE.*' ')' -print0 | xargs -0 rm -f
+}
+
+function cleandsstores() {
+    find . -name '.DS_Store' -exec rm -f '{}' ';'
+}
+
+alias json='prettify-json'
+alias map='xargs -n1'
+alias collapse="sed -e 's/  */ /g'"
+alias cuts='cut -d\ '
+
+# Directories {{{
+
+function cdff() { #--description "cd's into the current front-most open Finder window's directory"
+    cd (ff $argv)
+}
+
+alias cx='chmod +x'
+alias 'c-x'='chmod -x'
+
+# }}}
+
+function wtf() { #-d "Print which and --version output for the given command"
+    for arg in $argv; do
+        echo $arg: (which $arg)
+        echo $arg: (sh -c "$arg --version")
+    done
+}
+
